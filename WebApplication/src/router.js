@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import Settings from './components/Settings.vue'
+import Login from './components/Login.vue'
 import StudyList from './components/StudyList.vue'
 import SideBar from './components/SideBar.vue'
 import NotFound from './components/NotFound.vue'
@@ -30,6 +31,13 @@ export const router = createRouter({
       components: {
         SideBarView: SideBar,
         ContentView: Settings,
+      },
+    },
+    {
+      path: '/login',
+      components: {
+        SideBarView: SideBar,
+        ContentView: Login,
       },
     },
     {

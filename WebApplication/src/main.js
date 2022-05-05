@@ -10,6 +10,9 @@ import "./assets/css/layout.css"
 import "./assets/css/common.css"
 import store from "./store"
 import { router } from './router'
+import interceptorSetup from "./interceptors"
+
+interceptorSetup();
 
 const app = createApp(App)
 

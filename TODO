@@ -1,8 +1,113 @@
+Status of this branch:
+Aim was to test implementing a custom login page for basic auth.  This was not easy at all !
+And, even if it would work, the browser would not remember login/pwd for next time -> bad idea !
+
+Note that, for this to work, Orthanc was patched to allow serving the static code without any authentication check (which might be usefull in the future)
+
+Orthanc patch:
+-------------
+
+diff -r 0f0ada196993 OrthancFramework/Sources/HttpServer/HttpServer.cpp
+--- a/OrthancFramework/Sources/HttpServer/HttpServer.cpp	Wed May 04 10:50:34 2022 +0200
++++ b/OrthancFramework/Sources/HttpServer/HttpServer.cpp	Thu May 05 17:25:37 2022 +0200
+@@ -35,6 +35,7 @@
+ #include "IHttpHandler.h"
+ #include "MultipartStreamReader.h"
+ #include "StringHttpOutput.h"
++#include <boost/regex.hpp>
+ 
+ #if ORTHANC_ENABLE_PUGIXML == 1
+ #  include "IWebDavBucket.h"
+@@ -1181,18 +1182,6 @@
+       HttpToolbox::ParseGetArguments(argumentsGET, request->query_string);
+     }
+ 
+-    
+-    AccessMode accessMode = IsAccessGranted(server, headers);
+-
+-    // Authenticate this connection
+-    if (server.IsAuthenticationEnabled() && 
+-        accessMode == AccessMode_Forbidden)
+-    {
+-      output.SendUnauthorized(server.GetRealm());   // 401 error
+-      return;
+-    }
+-
+-    
+ #if ORTHANC_ENABLE_MONGOOSE == 1
+     // Apply the filter, if it is installed
+     char remoteIp[24];
+@@ -1272,29 +1261,58 @@
+       return;
+     }
+     
++    std::list<boost::regex> uncheckedResources_;
++    uncheckedResources_.push_back(boost::regex("/"));
++    uncheckedResources_.push_back(boost::regex("/app/.*"));
++    uncheckedResources_.push_back(boost::regex("/plugins/explorer.js"));
++    uncheckedResources_.push_back(boost::regex("/oe2/app/.*"));
++
++    bool isUncheckedResource = false;
++    for (std::list<boost::regex>::const_iterator it = uncheckedResources_.begin();
++        it != uncheckedResources_.end(); ++it)
++    {
++      boost::cmatch what;
++
++      if (boost::regex_match(requestUri, what, *it))
++      {
++        isUncheckedResource = true;
++        break;
++      }
++    }
++
++    AccessMode accessMode = IsAccessGranted(server, headers);
++
++    // Authenticate this connection
++    if (!isUncheckedResource && 
++        server.IsAuthenticationEnabled() && 
++        accessMode == AccessMode_Forbidden)
++    {
++      output.SendUnauthorized(server.GetRealm());   // 401 error
++      return;
++    }
+ 
+     const std::string username = GetAuthenticatedUsername(headers);
+ 
+-    if (accessMode != AccessMode_AuthorizationToken)
++    if (!isUncheckedResource && 
++        accessMode != AccessMode_AuthorizationToken)
+     {
+       // Check that this access is granted by the user's authorization
+       // filter. In the case of an authorization bearer token, grant
+       // full access to the API.
+ 
+       assert(accessMode == AccessMode_Forbidden ||  // Could be the case if "!server.IsAuthenticationEnabled()"
+-             accessMode == AccessMode_RegisteredUser);
++            accessMode == AccessMode_RegisteredUser);
+       
+       IIncomingHttpRequestFilter *filter = server.GetIncomingHttpRequestFilter();
+       if (filter != NULL &&
+           !filter->IsAllowed(filterMethod, requestUri, remoteIp,
+-                             username.c_str(), headers, argumentsGET))
++                            username.c_str(), headers, argumentsGET))
+       {
+         output.SendStatus(HttpStatus_403_Forbidden);
+         return;
+       }
+     }
+ 
+-
+ #if ORTHANC_ENABLE_PUGIXML == 1
+     if (HandleWebDav(output, server.GetWebDavBuckets(), request->request_method,
+                      headers, requestUri, connection))
+
+
+
+
 For this version:
 ****************
 
-- implement login (https://router.vuejs.org/guide/advanced/meta.html)
-
+- implement login (plugin to authorize all static assets even if registeredusers)
 - show orthanc id somewhere (button to copy it or open the "api" view (ex: /studies/{id}) ?)
 - add copy to clipboard buttons for study-details and series-details (https://codepen.io/nathanlong/pen/edVQjy)
 
@@ -10,8 +115,13 @@ For this version:
 - filter by modality (dropdown with check box)
 
 
+
+
+
 For next version:
 ****************
+
+- implement login
 - show jobs e.g. when sending a study to a remote modality/peer
   (jobs-registry -> use this.$bus.$on('new-job-created') ...)
 - filter by daterange - including date picker (https://vcalendar.io/vue-3.html ?)

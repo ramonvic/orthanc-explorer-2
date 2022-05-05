@@ -306,7 +306,42 @@ export default {
                         class="form-control study-list-filter"
                         v-model="filterStudyDescription"
                         placeholder="Chest"
-                    />                                  
+                    />
+<div v-if="columnTag=='modalities'" class="dropdown">
+        <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-bs-toggle="dropdown" id="dropdown-modalities-button" aria-expanded="false"><span class="fa fa-list"></span>&nbsp;<span class="caret"></span></button>
+<ul class="dropdown-menu" aria-labelledby="dropdown-modalities-button">
+  <li><a href="#" class="dropdown-item" data-value="all" tabIndex="-1"><input type="checkbox"/>&nbsp;All</a></li>
+  <li><a href="#" class="dropdown-item" data-value="none" tabIndex="-1"><input type="checkbox"/>&nbsp;None</a></li>
+  <li><hr class="dropdown-divider"></li>
+  <li><a href="#" class="dropdown-item" data-value="CR" tabIndex="-1"><input type="checkbox"/>&nbsp;CR</a></li>
+  <li><a href="#" class="dropdown-item" data-value="CT" tabIndex="-1"><input type="checkbox"/>&nbsp;CT</a></li>
+  <li><a href="#" class="dropdown-item" data-value="DR" tabIndex="-1"><input type="checkbox"/>&nbsp;DR</a></li>
+  <li><a href="#" class="dropdown-item" data-value="DX" tabIndex="-1"><input type="checkbox"/>&nbsp;DX</a></li>
+  <li><a href="#" class="dropdown-item" data-value="MG" tabIndex="-1"><input type="checkbox"/>&nbsp;MG</a></li>
+  <li><a href="#" class="dropdown-item" data-value="MR" tabIndex="-1"><input type="checkbox"/>&nbsp;MR</a></li>
+  <li><a href="#" class="dropdown-item" data-value="NM" tabIndex="-1"><input type="checkbox"/>&nbsp;NM</a></li>
+  <li><a href="#" class="dropdown-item" data-value="OT" tabIndex="-1"><input type="checkbox"/>&nbsp;OT</a></li>
+  <li><a href="#" class="dropdown-item" data-value="PT" tabIndex="-1"><input type="checkbox"/>&nbsp;PT</a></li>
+  <li><a href="#" class="dropdown-item" data-value="PX" tabIndex="-1"><input type="checkbox"/>&nbsp;PX</a></li>
+  <li><a href="#" class="dropdown-item" data-value="SEG" tabIndex="-1"><input type="checkbox"/>&nbsp;SEG</a></li>
+  <li><a href="#" class="dropdown-item" data-value="SR" tabIndex="-1"><input type="checkbox"/>&nbsp;SR</a></li>
+  <li><a href="#" class="dropdown-item" data-value="US" tabIndex="-1"><input type="checkbox"/>&nbsp;US</a></li>
+  <li><a href="#" class="dropdown-item" data-value="XA" tabIndex="-1"><input type="checkbox"/>&nbsp;XA</a></li>
+</ul>
+  </div>
+
+<!-- <button v-if="columnTag=='modalities'" type="button" class="btn btn-secondary" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="bottom" data-bs-content="Bottom popover">
+  Popover on bottom
+</button> -->
+                    <!-- <button v-if="columnTag=='modalities'"
+                        class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="collapse" href="#collapseModalities" role="button" aria-expanded="false" aria-controls="collapseModalities">
+                        Modality
+                    </button>
+                    <div class="colapse" id="collapseModalities"
+                        v-if="columnTag=='modalities'"
+                    >
+                    toto
+                    </div> -->
                 </th>
             </thead>
             <StudyItem
