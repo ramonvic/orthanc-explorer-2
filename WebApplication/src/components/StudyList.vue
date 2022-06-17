@@ -421,6 +421,8 @@ export default {
                 activeFilters.push('ModalitiesInStudy=' + this.getModalityFilter());
             }
 
+            console.log('Query Params: ', this.$route.query);
+
             let newUrl = "";
             if (activeFilters.length > 0) {
                 newUrl = "/filtered-studies?" + activeFilters.join('&');
